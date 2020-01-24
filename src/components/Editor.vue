@@ -5,6 +5,8 @@
 </template>
 
 <script>
+import hljs from "highlight.js";
+import "highlight.js/styles/monokai-sublime.css";
 export default {
   name: "Editor",
   methods: {},
@@ -32,6 +34,10 @@ export default {
             ],
             handlers: { emoji: () => {} }
           },
+          syntax: {
+            highlight: text => hljs.highlightAuto(text).value
+          },
+
           //plugin drag and drop
           imageDrop: true,
           //plugin resize

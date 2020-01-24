@@ -1,15 +1,49 @@
 <template>
   <div class="editor">
+    <button @click="openfile" class="button is-small is-primary is-outlined">Abrir Arquivo</button>
+    <button @click="saveFile" class="button is-small is-info is-outlined">Salvar Arquivo</button>
     <quill-editor v-model="content" :options="editorOption"></quill-editor>
   </div>
 </template>
 
 <script>
 import hljs from "highlight.js";
+import { remote } from "electron";
 import "highlight.js/styles/monokai-sublime.css";
+import "bulma/css/bulma.min.css";
+import fs from "fs";
 export default {
   name: "Editor",
-  methods: {},
+  methods: {
+    openFile() {
+      // eslint-disable-next-line no-unused-vars
+      const [filepath] = remote.dialog.showOpenDialog({
+        properties: ["openFile"]
+      });
+      const context = this;
+      if (filepath === undefined || !filepath.includes(".escola.js")) {
+        alert("Nenhum arquivo selecionado");
+        return;
+      }
+      fs.readFile(filepath, "utf-8", (err, data) => {
+        if (err) {
+          alert("Um erro ocorreu: " + err.message);
+          return;
+        }
+        context.content = data;
+      });
+    },
+    saveFile() {
+      const filenameToSave = remote.dialog.showSaveDialog();
+      const filepathToSave = filenameToSave.includes(".escola_js")
+        ? filenameToSave
+        : `${filenameToSave}.escola_js`;
+      fs.writeFile(filepathToSave, this.content, err => {
+        if (err) throw err;
+        alert("Aqruivo salvo com sucesso");
+      });
+    }
+  },
   data() {
     return {
       content: "",
@@ -72,5 +106,8 @@ export default {
   line-height: 3em;
   text-indent: 1rem;
   font-weight: bold;
+}
+button {
+  margin: 5px 5px 5px 5px;
 }
 </style>
